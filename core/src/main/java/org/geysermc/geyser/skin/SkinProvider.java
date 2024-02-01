@@ -64,14 +64,14 @@ public class SkinProvider {
     static final Cape EMPTY_CAPE = new Cape("", "no-cape", ByteArrays.EMPTY_ARRAY, -1, true);
 
     private static final Cache<String, Cape> CACHED_JAVA_CAPES = CacheBuilder.newBuilder()
-            .expireAfterAccess(1, TimeUnit.HOURS)
+            .expireAfterAccess(1, TimeUnit.MINUTES)
             .build();
     private static final Cache<String, Skin> CACHED_JAVA_SKINS = CacheBuilder.newBuilder()
             .expireAfterAccess(1, TimeUnit.HOURS)
             .build();
 
     private static final Cache<String, Cape> CACHED_BEDROCK_CAPES = CacheBuilder.newBuilder()
-            .expireAfterAccess(1, TimeUnit.HOURS)
+            .expireAfterAccess(1, TimeUnit.MINUTES)
             .build();
     private static final Cache<String, Skin> CACHED_BEDROCK_SKINS = CacheBuilder.newBuilder()
             .expireAfterAccess(1, TimeUnit.HOURS)
@@ -670,16 +670,14 @@ public class SkinProvider {
 
     private static BufferedImage downloadImage(String imageUrl, CapeProvider provider) throws IOException {
         BufferedImage image;
-        if (provider == CapeProvider.FIVEZIG) {
-            image = readFiveZigCape(imageUrl);
-        } else {
-            HttpURLConnection con = (HttpURLConnection) new URL(imageUrl).openConnection();
-            con.setRequestProperty("User-Agent", "Geyser-" + GeyserImpl.getInstance().getPlatformType().toString() + "/" + GeyserImpl.VERSION);
-            con.setConnectTimeout(10000);
-            con.setReadTimeout(10000);
 
-            image = ImageIO.read(con.getInputStream());
-        }
+        HttpURLConnection con = (HttpURLConnection) new URL(imageUrl).openConnection();
+        con.setRequestProperty("User-Agent", "Geyser-" + GeyserImpl.getInstance().getPlatformType().toString() + "/" + GeyserImpl.VERSION);
+        con.setConnectTimeout(10000);
+        con.setReadTimeout(10000);
+
+        image = ImageIO.read(con.getInputStream());
+        
 
         if (image == null) {
             throw new IllegalArgumentException("Failed to read image from: %s (cape provider=%s)".formatted(imageUrl, provider));
@@ -829,12 +827,9 @@ public class SkinProvider {
     @Getter
     public enum CapeProvider {
         MINECRAFT,
-        OPTIFINE("https://optifine.net/capes/%s.png", CapeUrlType.USERNAME),
-        LABYMOD("https://dl.labymod.net/capes/%s", CapeUrlType.UUID_DASHED),
-        FIVEZIG("https://textures.5zigreborn.eu/profile/%s", CapeUrlType.UUID_DASHED),
-        MINECRAFTCAPES("https://api.minecraftcapes.net/profile/%s/cape", CapeUrlType.UUID);
+        COSMETICA("http://cosmetifine.cosmetica.cc/shrunk/%s.png?timestamp=" + System.currentTimeMillis(), CapeUrlType.USERNAME);
 
-        public static final CapeProvider[] VALUES = Arrays.copyOfRange(values(), 1, 5);
+        public static final CapeProvider[] VALUES = Arrays.copyOfRange(values(), 1, 2);
         private String url;
         private CapeUrlType type;
 
